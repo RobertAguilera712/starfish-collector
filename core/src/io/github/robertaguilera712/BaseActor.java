@@ -1,17 +1,17 @@
 package io.github.robertaguilera712;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import jdk.internal.jimage.ImageHeader;
 
 public class BaseActor extends Actor {
     private Animation<TextureRegion> animation;
@@ -27,6 +27,8 @@ public class BaseActor extends Actor {
     private float deceleration;
 
     private Polygon boundaryPolygon;
+
+    public static Rectangle worldBounds;
 
     public BaseActor(float x, float y, Stage s) {
         super();
@@ -253,11 +255,11 @@ public class BaseActor extends Actor {
         centerAtPosition(other.getX() + other.getWidth() / 2, other.getY() + other.getHeight() / 2);
     }
 
-    public void setOpacity(float opacity){
+    public void setOpacity(float opacity) {
         getColor().a = opacity;
     }
 
-    public Vector2 preventOverlap(BaseActor other){
+    public Vector2 preventOverlap(BaseActor other) {
         Polygon poly1 = this.getBoundaryPolygon();
         Polygon poly2 = other.getBoundaryPolygon();
 
@@ -274,24 +276,60 @@ public class BaseActor extends Actor {
         return mtv.normal;
     }
 
-    public static Array<BaseActor> getArray(Stage stage, String className){
+    public static Array<BaseActor> getArray(Stage stage, String className) {
         Array<BaseActor> array = new Array<>();
         Class theClass = null;
-        try{
+        try {
             theClass = Class.forName(className);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        for (Actor a : stage.getActors()){
+        for (Actor a : stage.getActors()) {
             if (theClass.isInstance(a))
                 array.add((BaseActor) a);
         }
         return array;
     }
 
-    public static int count(Stage stage, String className){
+    public static int count(Stage stage, String className) {
         return getArray(stage, className).size;
+    }
+
+    public static void setWorldBounds(float width, float height) {
+        worldBounds = new Rectangle(0, 0, width, height);
+    }
+
+    public static void setWorldBounds(BaseActor ba) {
+        setWorldBounds(ba.getWidth(), ba.getHeight());
+    }
+
+    public void boundToWorld() {
+        // check left edge
+        if (getX() < 0)
+            setX(0);
+        // check right edge
+        if (getX() + getWidth() > worldBounds.width)
+            setX(worldBounds.width - getWidth());
+        // check bottom edge
+        if (getY() < 0)
+            setY(0);
+        // check top edge
+        if (getY() + getHeight() > worldBounds.height)
+            setY(worldBounds.height - getHeight());
+    }
+
+    public void alignCamera() {
+        Camera cam = this.getStage().getCamera();
+        Viewport v = this.getStage().getViewport();
+
+        // center the camera on the actor
+        cam.position.set(this.getX() + this.getOriginX(), this.getY() + this.getOriginY(), 0);
+
+        // bound camera to layout
+        cam.position.x = MathUtils.clamp(cam.position.x, cam.viewportWidth / 2, worldBounds.width - cam.viewportWidth / 2);
+        cam.position.y = MathUtils.clamp(cam.position.y, cam.viewportHeight / 2, worldBounds.height - cam.viewportHeight / 2);
+        cam.update();
     }
 
 }

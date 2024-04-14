@@ -15,8 +15,9 @@ public class StarfishCollector extends GameBeta {
     @Override
     public void initialize() {
         BaseActor ocean = new BaseActor(0, 0, mainStage);
-        ocean.loadTexture("water.jpg");
-        ocean.setSize(800, 600);
+        ocean.loadTexture("water-border.jpg");
+        ocean.setSize(1200, 900);
+        BaseActor.setWorldBounds(ocean);
 
         new Starfish(400, 400, mainStage);
         new Starfish(500, 100, mainStage);
@@ -51,7 +52,7 @@ public class StarfishCollector extends GameBeta {
 
         if (BaseActor.count(mainStage, Starfish.class.getName()) == 0 && !win){
             win = true;
-            BaseActor winMessage = new BaseActor(0, 0, mainStage);
+            BaseActor winMessage = new BaseActor(0, 0, uiStage);
             winMessage.loadTexture("you-win.png");
             winMessage.centerAtPosition(400, 300);
             winMessage.setOpacity(0);

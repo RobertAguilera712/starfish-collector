@@ -21,7 +21,7 @@ public class Turtle extends BaseActor {
     public void act(float delta) {
         super.act(delta);
 
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
             accelerateAtAngle(180);
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
             accelerateAtAngle(0);
@@ -36,5 +36,7 @@ public class Turtle extends BaseActor {
 
         if (getSpeed() > 0)
             setRotation(getMotionAngle());
+        boundToWorld();
+        alignCamera();
     }
 }
