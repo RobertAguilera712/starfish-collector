@@ -11,6 +11,6 @@ public class DesktopLauncher {
 		config.setForegroundFPS(60);
 		config.setTitle("StarfishCollector");
 		config.setWindowedMode(800, 600);
-		new Lwjgl3Application(new StarfishCollector(), config);
+		new Lwjgl3Application(new StarfishGame(), config);
 	}
 }
